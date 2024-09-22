@@ -1,0 +1,65 @@
+import RPi.GPIO as GPIO
+import time
+import tkinter as tk
+
+# Set up GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(27, GPIO.OUT) 
+GPIO.setup(22, GPIO.OUT) 
+GPIO.setup(17, GPIO.OUT) 
+
+# Create PWM objects for each LED
+pwm1 = GPIO.PWM(18, 100)
+pwm2 = GPIO.PWM(23, 100)
+pwm3 = GPIO.PWM(24, 100)
+
+# Create GUI window
+window = Tk()
+window.title("LED Intensity PWM")
+
+# Create slider widgets
+slider1 = Scale(window, from_=0, to=100, orient=HORIZONTAL, label="Green LED")
+slider2 = Scale(window, from_=0, to=100, orient=HORIZONTAL, label="Red LED")
+slider3 = Scale(window, from_=0, to=100, orient=HORIZONTAL, label="White LED")
+
+# Create reset button
+reset_button = Button(window, text="Reset", command=reset_leds)
+exit_button = Button(window, text="Exit", command=window.quit)
+
+# Function to update LED intensity based on slider values
+def update_leds():
+    duty_cycle1 = slider1.get()
+    duty_cycle2 = slider2.get()
+    duty_cycle3 = slider3.get()
+    pwm1.start(duty_cycle1)
+    pwm2.start(duty_cycle2)
+    pwm3.start(duty_cycle3)
+
+# Function to reset LED intensities to 0
+def reset_leds():
+    slider1.set(0)
+    slider2.set(0)
+    slider3.set(0)
+    update_leds()
+
+# Bind slider value changes and reset button to update_leds function
+slider1.config(command=update_leds)
+slider2.config(command=update_leds)
+slider3.config(command=update_leds)
+reset_button.config(command=reset_leds)
+
+# Place widgets in the window
+slider1.pack()
+slider2.pack()
+slider3.pack()
+reset_button.pack()
+exit_button.pack()
+
+# Start the GUI event loop
+window.mainloop()
+
+# Clean up GPIO
+pwm1.stop()
+pwm2.stop()
+pwm3.stop()
+GPIO.cleanup()
